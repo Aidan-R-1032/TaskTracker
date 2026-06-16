@@ -1,41 +1,34 @@
+using Microsoft.EntityFrameworkCore;
+using TaskTracker.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Add services to the container
+builder.Services.AddOpenApi();                                                          // Adds OpenAPI/Swagger services to the application for API documentation and testing
+
+builder.Services.AddDbContext<AppDbContext>(options =>                                  // Registers the AppDbContext with the dependency injection container,
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))); // configuring it to use SQL Server with a connection string from the configuration
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Apply migrations automatically on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();                  // Creates a scope to resolve the AppDbContext service
+    
+    db.Database.MigrateAsync().Wait();                                                  // Applies any pending migrations to the database, ensuring that the
+                                                                                        // database schema is up to date with the application's data model
+}
+
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi();                                                                   // Maps the OpenAPI/Swagger UI to the application,
+                                                                                        // allowing interactions with the API documentation and test API endpoints during development
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection();                                                              // Adds middleware to redirect HTTP requests to HTTPS,
+                                                                                        // ensuring secure communication between the client and server
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+app.Run();                                                                              // Starts the application and begins listening for incoming HTTP requests,
+                                                                                        // effectively running the web server and making the API available to clients

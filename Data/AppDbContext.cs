@@ -27,6 +27,9 @@ namespace TaskTracker.Data
                 entity.Property(t => t.CreatedAt)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                entity.Property(t => t.IsCompleted)
+                    .HasDefaultValue(false);
+
                 entity.Property(t => t.Priority)
                     .HasConversion<string>();
             });
