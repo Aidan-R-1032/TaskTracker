@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TaskTracker.Data;
+using TaskTracker.Services;
+using MyTaskFactory = TaskTracker.Services.TaskFactory;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,16 +12,22 @@ builder.Services.AddOpenApi();                                                  
 builder.Services.AddDbContext<AppDbContext>(options =>                                  // Registers the AppDbContext with the dependency injection container,
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))); // configuring it to use SQL Server with a connection string from the configuration
 
+// New task service is created with each HTTP request,
+// ensuring that it has a fresh instance of the database context for each operation
+builder.Services.AddScoped<ITaskService, TaskService>();
+
+// One TaskFacory instance is shared for the apps lifetime
+builder.Services.AddSingleton<MyTaskFactory>();
+
 var app = builder.Build();
 
 // Apply migrations automatically on startup
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();                  // Creates a scope to resolve the AppDbContext service
-    
-    db.Database.MigrateAsync().Wait();                                                  // Applies any pending migrations to the database, ensuring that the
-                                                                                        // database schema is up to date with the application's data model
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
 }
+
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
