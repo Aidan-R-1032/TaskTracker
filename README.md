@@ -3,6 +3,8 @@
 A RESTful task management API built with ASP.NET Core Minimal API, Entity Framework Core, and SQLite.
 Designed as a portfolio project to demonstrate practical use of the .NET ecosystem.
 
+![Scalar UI Screenshot](TaskTrackerWebpage.png)
+
 ## Tech Stack
 
 - **ASP.NET Core Minimal API** (.NET 10)
