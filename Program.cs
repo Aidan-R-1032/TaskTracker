@@ -26,6 +26,9 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 // One TaskFacory instance is shared for the apps lifetime
 builder.Services.AddSingleton<MyTaskFactory>();
 
+// Registers the OverdueTaskWorker as a hosted service, which will run in the background independently of the HTTP request handling
+builder.Services.AddHostedService<OverdueTaskWorker>();
+
 var app = builder.Build();
 
 // Apply migrations automatically on startup
