@@ -33,12 +33,19 @@ This project follows **SOLID principles** throughout:
 ## Project Structure
 
 TaskTracker/
+
 ├── Models/             # Domain entities
+
 ├── Dtos/               # Request/response shapes and mapper
+
 ├── Data/               # EF Core DbContext
+
 ├── Services/           # Business logic, factory, and background worker
+
 ├── Endpoints/          # Minimal API route definitions
+
 └── Program.cs          # App configuration and DI registration
+
 
 ## Getting Started
 
